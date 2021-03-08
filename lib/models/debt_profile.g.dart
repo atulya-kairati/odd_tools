@@ -17,8 +17,8 @@ class DebtProfileAdapter extends TypeAdapter<DebtProfile> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return DebtProfile(
-      fields[0] as String,
-      (fields[1] as List)?.cast<Transaction>(),
+      name: fields[0] as String,
+      transactions: (fields[1] as List)?.cast<Transaction>(),
     );
   }
 
@@ -54,9 +54,9 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Transaction(
-      fields[0] as String,
-      fields[1] as int,
-      fields[2] as DateTime,
+      purpose: fields[0] as String,
+      amount: fields[1] as int,
+      dateTime: fields[2] as DateTime,
     );
   }
 

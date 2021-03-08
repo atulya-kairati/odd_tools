@@ -30,11 +30,13 @@ class ProfileInputArea extends StatelessWidget {
             children: [
               Text('Enter Profile Name'),
               TextField(
+                autofocus: true,
                 controller: profileNameTextEditingController,
                 cursorColor: Colors.redAccent,
                 decoration: InputDecoration(
                   labelText: 'Profile Name',
                 ),
+                onSubmitted: (_) => saveData(context),
               ),
               SizedBox(height: 16),
               ElevatedButton(

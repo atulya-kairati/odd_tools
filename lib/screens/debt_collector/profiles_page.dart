@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:odd_tools/models/debt_profile.dart';
+import 'package:odd_tools/screens/debt_collector/dashboard.dart';
 import 'package:odd_tools/widgets/profile_input_area.dart';
 
 class ProfilePAge extends StatefulWidget {
@@ -32,6 +33,14 @@ class _ProfilePAgeState extends State<ProfilePAge> {
       appBar: AppBar(
         title: Text('Debt Collector'),
         backgroundColor: ProfilePAge.mainColor,
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Hive.box('debts').getAt(0).name; //= 'Mota';
+            },
+            child: Text('Test'),
+          )
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add, color: Colors.white),
@@ -88,11 +97,19 @@ class ProfileList extends StatelessWidget {
           itemBuilder: (_, index) {
             final debtProfile = debtProfilesBox.getAt(index) as DebtProfile;
             return ListTile(
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          DebtDashboard(profileName: debtProfile.name)),
+                );
+              },
               title: Text(debtProfile.name),
               trailing: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {
+                  log('deleted profile: ${debtProfilesBox.getAt(index).name}');
                   debtProfilesBox.deleteAt(index);
                 },
               ),
