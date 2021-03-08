@@ -68,10 +68,17 @@ class _ProfilePAgeState extends State<ProfilePAge> {
                   },
                 );
               });
+          // adding for test
           // Hive.box('debts').add(DebtProfile(
-          //   'Pranshu Mottu',
-          //   [Transaction('purpose', 2, DateTime.now())],
-          // ));
+          //       name: 'Pranshu Mottu',
+          //       transactions: [
+          //         Transaction(
+          //           purpose: 'purpose',
+          //           amount: 2,
+          //           dateTime: DateTime.now(),
+          //         ),
+          //       ],
+          //     ));
         },
       ),
       body: FutureBuilder(
