@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:odd_tools/models/debt_profile.dart';
+import 'package:odd_tools/widgets/profile_input_area.dart';
 
 class ProfilePAge extends StatefulWidget {
   const ProfilePAge({Key key}) : super(key: key);
@@ -14,6 +15,14 @@ class ProfilePAge extends StatefulWidget {
 }
 
 class _ProfilePAgeState extends State<ProfilePAge> {
+  saveProfile(String profileName) {
+    Hive.box('debts').add(DebtProfile(
+      profileName,
+      <Transaction>[],
+    ));
+    log('Created Profile: $profileName');
+  }
+
   @override
   Widget build(BuildContext context) {
     const functionName = 'build';
@@ -28,10 +37,19 @@ class _ProfilePAgeState extends State<ProfilePAge> {
         child: Icon(Icons.add, color: Colors.white),
         backgroundColor: ProfilePAge.mainColor.shade400,
         onPressed: () {
-          Hive.box('debts').add(DebtProfile(
-            'Pranshu Mottu',
-            [Transaction('purpose', 2, DateTime.now())],
-          ));
+          showModalBottomSheet(
+              context: context,
+              builder: (context) {
+                return ProfileInputArea(
+                  onSave: (profileName) {
+                    saveProfile(profileName);
+                  },
+                );
+              });
+          // Hive.box('debts').add(DebtProfile(
+          //   'Pranshu Mottu',
+          //   [Transaction('purpose', 2, DateTime.now())],
+          // ));
         },
       ),
       body: FutureBuilder(
