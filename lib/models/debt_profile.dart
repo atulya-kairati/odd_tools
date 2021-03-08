@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 part 'debt_profile.g.dart';
 
 @HiveType(typeId: 0)
-class DebtProfile {
+class DebtProfile extends HiveObject {
   @HiveField(0)
   String name;
   @HiveField(1)
@@ -12,7 +12,7 @@ class DebtProfile {
 }
 
 @HiveType(typeId: 1)
-class Transaction {
+class Transaction extends HiveObject {
   @HiveField(0)
   String purpose;
 

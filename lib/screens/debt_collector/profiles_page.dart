@@ -17,9 +17,11 @@ class ProfilePAge extends StatefulWidget {
 
 class _ProfilePAgeState extends State<ProfilePAge> {
   saveProfile(String profileName) {
+    const functionName = 'saveProfile';
+    log('$functionName in ${ProfilePAge.classname} called');
     Hive.box('debts').add(DebtProfile(
-      profileName,
-      <Transaction>[],
+      name: profileName,
+      transactions: <Transaction>[],
     ));
     log('Created Profile: $profileName');
   }
@@ -33,14 +35,25 @@ class _ProfilePAgeState extends State<ProfilePAge> {
       appBar: AppBar(
         title: Text('Debt Collector'),
         backgroundColor: ProfilePAge.mainColor,
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Hive.box('debts').getAt(0).name; //= 'Mota';
-            },
-            child: Text('Test'),
-          )
-        ],
+        // actions: [
+        //   ElevatedButton(
+        //     onPressed: () {
+        //       var test = Hive.box('debts').getAt(0) as DebtProfile;
+        //       test.name = "Mota";
+
+        //       /*
+        //       .Save() comes if you extend the object to HiveObject
+        //       This is good because without calling .save()
+        //       ValueListnableBuilder is not triggered :)
+        //       */
+
+        //       test.save();
+        //       // test.save();
+        //       print(test.name);
+        //     },
+        //     child: Text('Test'),
+        //   )
+        // ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add, color: Colors.white),
@@ -75,6 +88,8 @@ class _ProfilePAgeState extends State<ProfilePAge> {
 
   @override
   void dispose() {
+    const functionName = 'dispose';
+    log('$functionName in ${ProfilePAge.classname} called');
     // Hive.box('debts').clear();
     Hive.box('debts').compact();
     Hive.box('debts').close();
@@ -101,8 +116,7 @@ class ProfileList extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          DebtDashboard(profileName: debtProfile.name)),
+                      builder: (context) => DebtDashboard(index: index)),
                 );
               },
               title: Text(debtProfile.name),
