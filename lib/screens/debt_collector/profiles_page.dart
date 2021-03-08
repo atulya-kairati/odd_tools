@@ -32,7 +32,6 @@ class _ProfilePAgeState extends State<ProfilePAge> {
             'Pranshu Mottu',
             [Transaction('purpose', 2, DateTime.now())],
           ));
-          setState(() {});
         },
       ),
       body: FutureBuilder(
