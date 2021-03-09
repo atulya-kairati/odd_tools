@@ -86,7 +86,8 @@ class DebtDashboard extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) => TransactionEditor()),
+                                builder: (_) =>
+                                    TransactionEditor(profileIndex: index)),
                           );
 
                           // requiredProfile.transactions = [
