@@ -116,7 +116,7 @@ class _TransactionEditorState extends State<TransactionEditor> {
             ),
             SizedBox(height: 8),
             TextField(
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
               controller: purposeTextEditingController,
               minLines: 2,
               maxLines: null,
