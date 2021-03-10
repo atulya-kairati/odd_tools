@@ -6,6 +6,12 @@ import 'models/debt_profile.dart';
 import 'package:hive/hive.dart';
 
 void main() async {
+  // This has to be the first line since in main
+  // we are awaiting and runApp() is called before that
+  // https://stackoverflow.com/questions/57689492/flutter-unhandled-exception-servicesbinding-defaultbinarymessenger-was-accesse
+  WidgetsFlutterBinding.ensureInitialized();
+  // refer
+
   final appDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDir.path);
   Hive.registerAdapter(DebtProfileAdapter());
@@ -29,6 +35,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
 // test
