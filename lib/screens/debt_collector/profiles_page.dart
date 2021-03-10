@@ -123,7 +123,7 @@ class ProfileList extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DebtDashboard(index: index)),
+                      builder: (context) => DebtDashboard(profileIndex: index)),
                 );
               },
               title: Text(debtProfile.name),

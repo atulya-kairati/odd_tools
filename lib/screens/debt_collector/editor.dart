@@ -22,7 +22,8 @@ class _TransactionEditorState extends State<TransactionEditor> {
   DateTime date = DateTime.now();
   TextEditingController amountTextEditingController = TextEditingController();
   TextEditingController purposeTextEditingController = TextEditingController();
-  String radioState = "given";
+  static const radioStateGiven = "given", radioStateTaken = "taken";
+  String radioState = radioStateGiven;
 
   getDate() async {
     DateTime pickedDate = await showDatePicker(
@@ -46,7 +47,7 @@ class _TransactionEditorState extends State<TransactionEditor> {
 
     if (amount == null || purpose.isEmpty) return;
 
-    if (radioState == "taken") amount *= -1;
+    if (radioState == radioStateTaken) amount *= -1;
 
     log('$amount, $purpose, $date');
     var requiredProfile =
@@ -65,10 +66,30 @@ class _TransactionEditorState extends State<TransactionEditor> {
     Navigator.pop(context);
   }
 
+  void initForTransactionEdit() {
+    // called when saved transaction is to be edited
+    print('transactionIndex: ${widget.transactionIndex}');
+    Transaction requiredTransaction = Hive.box('debts')
+        .getAt(widget.profileIndex)
+        .transactions
+        .elementAt(widget.transactionIndex);
+    print(requiredTransaction.amount);
+    amountTextEditingController.text =
+        requiredTransaction.amount.abs().toString();
+
+    purposeTextEditingController.text = requiredTransaction.purpose;
+
+    radioState =
+        requiredTransaction.amount >= 0 ? radioStateGiven : radioStateTaken;
+
+    date = requiredTransaction.dateTime;
+  }
+
   @override
   void initState() {
     super.initState();
     print('profileIndex: ${widget.profileIndex}');
+    if (widget.transactionIndex != null) initForTransactionEdit();
   }
 
   @override
@@ -110,7 +131,7 @@ class _TransactionEditorState extends State<TransactionEditor> {
             SizedBox(height: 8),
             RadioListTile(
               title: Text('Given'),
-              value: "given",
+              value: radioStateGiven,
               groupValue: radioState,
               onChanged: (value) {
                 print(value);
@@ -121,7 +142,7 @@ class _TransactionEditorState extends State<TransactionEditor> {
             ),
             RadioListTile(
               title: Text('Taken'),
-              value: "taken",
+              value: radioStateTaken,
               groupValue: radioState,
               onChanged: (value) {
                 print(value);

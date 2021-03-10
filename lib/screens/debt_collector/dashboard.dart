@@ -1,26 +1,41 @@
 import 'dart:developer';
+import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:odd_tools/models/debt_profile.dart';
 import 'package:odd_tools/screens/debt_collector/editor.dart';
+import 'package:intl/intl.dart';
+
+// if the sum of transactions is -63 then
+// you should read it as "you have taken 63"
 
 class DebtDashboard extends StatelessWidget {
   const DebtDashboard({
     Key key,
-    @required this.index,
+    @required this.profileIndex,
   }) : super(key: key);
 
-  final int index;
+  final int profileIndex;
   static const classname = 'DebtDashboard';
 
   int get transactionSum {
-    final profile = Hive.box('debts').getAt(index) as DebtProfile;
+    final profile = Hive.box('debts').getAt(profileIndex) as DebtProfile;
     int sum = 0;
     for (Transaction transaction in profile.transactions) {
       sum += transaction.amount;
     }
     return sum;
+  }
+
+  void deleteTransaction(int transactionIndex) {
+    log("deletion index: $transactionIndex");
+    var requiredProfile = Hive.box('debts').getAt(profileIndex) as DebtProfile;
+    var savedTransactionList = [...requiredProfile.transactions];
+    savedTransactionList.removeAt(transactionIndex);
+    print(savedTransactionList);
+    requiredProfile.transactions = savedTransactionList;
+    requiredProfile.save();
   }
 
   @override
@@ -30,7 +45,7 @@ class DebtDashboard extends StatelessWidget {
     var total = transactionSum;
     print(total);
     var debtProfiles = Hive.box('debts');
-    var requiredProfile = debtProfiles.getAt(index) as DebtProfile;
+    var requiredProfile = debtProfiles.getAt(profileIndex) as DebtProfile;
     return Scaffold(
       appBar: AppBar(
         title: Text('${requiredProfile.name} Transactions'),
@@ -49,12 +64,83 @@ class DebtDashboard extends StatelessWidget {
                 child: Container(
                   child: ListView.builder(
                     itemCount: requiredProfile.transactions.length,
-                    itemBuilder: (_, index) {
-                      final transaction =
-                          requiredProfile.transactions.elementAt(index);
+                    itemBuilder: (_, transactionIndex) {
+                      Transaction transaction;
+                      try {
+                        transaction = requiredProfile.transactions
+                            .elementAt(transactionIndex);
+                      } catch (RangaError) {
+                        log('$RangeError => index: $transactionIndex');
+                        return SizedBox();
+                      }
                       return ListTile(
-                        title: Text(transaction.amount.abs().toString()),
-                        subtitle: Text(transaction.purpose),
+                        title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              transaction.amount >= 0 ? "Given" : "Taken",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: transaction.amount >= 0
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              transaction.amount.abs().toString(),
+                              style: TextStyle(
+                                fontFamily: "Quicksand",
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${transaction.purpose}',
+                              style: TextStyle(
+                                fontFamily: "Quicksand",
+                              ),
+                            ),
+                            Text(
+                              'On ${DateFormat.yMMMd().format(transaction.dateTime)} at ${DateFormat.Hm().format(transaction.dateTime)}',
+                              style: TextStyle(
+                                fontFamily: "Quicksand",
+                                color: Colors.grey,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                deleteTransaction(transactionIndex);
+                              },
+                              icon: Icon(Icons.delete),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TransactionEditor(
+                                      profileIndex: profileIndex,
+                                      transactionIndex: transactionIndex,
+                                    ),
+                                  ),
+                                );
+                              },
+                              icon: Icon(Icons.edit),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -86,8 +172,8 @@ class DebtDashboard extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (_) =>
-                                    TransactionEditor(profileIndex: index)),
+                                builder: (_) => TransactionEditor(
+                                    profileIndex: profileIndex)),
                           );
 
                           // requiredProfile.transactions = [
