@@ -26,6 +26,8 @@ class _TransactionEditorState extends State<TransactionEditor> {
   String radioState = radioStateGiven;
 
   getDate() async {
+    const functionName = "getDate";
+    log('$functionName in ${TransactionEditor.classname} called');
     DateTime pickedDate = await showDatePicker(
       context: context,
       initialDate: date,
@@ -40,6 +42,8 @@ class _TransactionEditorState extends State<TransactionEditor> {
   }
 
   void addNewTransaction() {
+    const functionName = "addNewTransaction";
+    log('$functionName in ${TransactionEditor.classname} called');
     // given -> +
     // taken -> -
     int amount = int.tryParse(amountTextEditingController.text);
@@ -53,20 +57,38 @@ class _TransactionEditorState extends State<TransactionEditor> {
     var requiredProfile =
         Hive.box('debts').getAt(widget.profileIndex) as DebtProfile;
 
-    requiredProfile.transactions = [
-      ...requiredProfile.transactions,
-      Transaction(
+    if (widget.transactionIndex == null) {
+      requiredProfile.transactions = [
+        ...requiredProfile.transactions,
+        Transaction(
+          amount: amount,
+          purpose: purpose,
+          dateTime: date,
+        )
+      ];
+    } else {
+      var editedTransaction = Transaction(
         amount: amount,
         purpose: purpose,
         dateTime: date,
-      )
-    ];
+      );
+      log('>> ${editedTransaction.amount}');
+      var newTransactionList = [...requiredProfile.transactions];
+      newTransactionList.removeAt(widget.transactionIndex);
+      newTransactionList.insert(widget.transactionIndex, editedTransaction);
+
+      // replacing the existing list in Hive
+      requiredProfile.transactions = newTransactionList;
+    }
+
     requiredProfile.save();
 
     Navigator.pop(context);
   }
 
   void initForTransactionEdit() {
+    const functionName = "initForTransactionEdit";
+    log('$functionName in ${TransactionEditor.classname} called');
     // called when saved transaction is to be edited
     print('transactionIndex: ${widget.transactionIndex}');
     Transaction requiredTransaction = Hive.box('debts')
@@ -87,6 +109,8 @@ class _TransactionEditorState extends State<TransactionEditor> {
 
   @override
   void initState() {
+    const functionName = "initState";
+    log('$functionName in ${TransactionEditor.classname} called');
     super.initState();
     print('profileIndex: ${widget.profileIndex}');
     if (widget.transactionIndex != null) initForTransactionEdit();
@@ -95,7 +119,7 @@ class _TransactionEditorState extends State<TransactionEditor> {
   @override
   Widget build(BuildContext context) {
     const functionName = 'build';
-    log('${TransactionEditor.classname} in $functionName called');
+    log('$functionName in ${TransactionEditor.classname} called');
     return Scaffold(
       appBar: AppBar(
         title: Text('Add New Transaction'),
